@@ -1,0 +1,138 @@
+
+git clone https://github.com/torvalds/linux
+git checkout v4.1
+ls
+
+ls arch/<you_arch>/configs/
+
+make x86_64_defconfig
+make zImage -j8
+make modules
+make INSTALL_MOD_PATH </where/to/install> modules_install
+
+ARCH=arm make imx_v6_v7_defconfig
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make zImage -j8
+
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make modules
+
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make modules_install
+
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make dtbs
+
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make imx6d- sabrelite.dtb
+
+
+CONFIG_MODULES=y
+
+depmod utility
+    /lib/modules/<kernel_release>/
+    modules.dep
+    modules.dep.bin
+    /lib/modules/<kernel_release>/modules.alias
+during development   insmod
+    insmod /path/to/mydrv.ko
+
+during production    modprobe
+    modprobe mydrv
+
+/etc/modules-load.d/<filename>.conf
+#this is a comment
+uio
+iwlwifi
+
+rmmod
+
+CONFIG_MODULE_UNLOAD=y
+
+
+MODULE_FORCE_UNLOAD=y
+
+rmmod -f mymodule
+
+modprove -r mymodule
+
+lsmod
+
+include/linux/init.h
+    __init
+    __exit 
+
+objdump -h module.ko
+
+LDF linker definition file
+LDS linker definition script
+
+arch/<arch>/kernel/vmlinux.lds.S
+
+
+MODULE_DESCRIPTION("Hello, world! Module")
+
+MODULE_INFO(my_field_name, "What eeasy value")
+
+
+include/uapi/asm-generic/errno-base.h
+include/uapi/asm-generic/errno.h
+
+strerror(errno)
+
+handling null pointer errors
+    void *ERR_PTR(long error);
+    long IS_ERR(const void *ptr);
+    long PTR_ERR(const void *ptr);
+
+# echo <level> > /proc/sys/kernel/printk
+
+Documentation/dynamic-debug-howto.txt
+
+
+module_param(name, type, perm)
+
+include/linux/moduleparam.h
+
+#include <linux/moduleparam.h>
+
+
+insmod hellomodule-params.ko mystring="packtpub" myint=15 myArray=1,2,3
+
+modinfo ./hellomodule-params.ko
+
+
+variable: obj<-X>
+
+pattern: obj-<X>
+
+where X shuild be either y, m, left blank or n
+
+obj-y += mymodule.o
+
+kbuild
+
+
+the obj-$(CONFIG_XXX) is often used
+
+obj-$(CONFIG_MYMODULE) += mymodule.o
+
+
+obj-<X> += somedir/
+
+
+----
+
+obj-m := helloworld.o
+
+KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+
+all default: modules
+
+install: modules_install
+
+modules modules_install help clean:
+
+$(MAKE) -C $(KERNELDIR) M=$(shell pwd) $@
+
+----
+
+
+
+
+
