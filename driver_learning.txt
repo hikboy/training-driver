@@ -1,4 +1,4 @@
-
+** ch1
 git clone https://github.com/torvalds/linux
 git checkout v4.1
 ls
@@ -21,6 +21,7 @@ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make dtbs
 
 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make imx6d- sabrelite.dtb
 
+** ch2
 
 CONFIG_MODULES=y
 
@@ -132,7 +133,191 @@ $(MAKE) -C $(KERNELDIR) M=$(shell pwd) $@
 
 ----
 
+mychardev.c
+
+driver/char
+
+every subdirectory in drivers has both Makefile and Kconfig
+
+Add the followingg content to the Kconfig
+
+config PACKT_MYCDEV
+    tristate "Our packtpub special Character driver"
+    default m
+    help 
+    Say Y here if you want to support the /dev/mycdev device.
+    The /dev/mycdev device is used to access packpub
+
+In the Makefile of that some same directory,
+    obj-$(CONFIG_PACKT_MYCDEV) += mychardev.o
 
 
+CONFIG_PACKT_MYCDEV=m
+
+
+/lib/modules/$(KERNELRELEASE)/kernel
+
+/lib/modules/$(uname -r)kernel/
+
+
+make modules_install
+
+obtain a prebuilt kernel version:
+
+build it by yourself
+
+install the linux-header-* package
+
+    sudo apt-get update
+    sudo apt-get install linux-headers-$(uname -r)
+
+headers will then be installed in 
+    /usr/src/linux-headers-$(uname -r)
+
+thare will be a symlink, 
+    /lib/modules/$(uname -r)/build
+
+** ch3
+
+container_of
+
+include/linux/kernel.h
+
+container_of(pointer, container_type, container,field)
+
+simply linked list
+doubly linked list
+
+<linux/list.h>
+
+struct list_head {
+    struct list_head *next, *prev;
+}
+
+
+static LIST_HEAD(carlist)
+
+
+creating and initializing the list
+
+dynamic method
+    struct list_head mylist;
+    INIT_LIST_HEAD(&mylist);
+
+static method
+    LIST_HEAD(name)
+    LIST_HEAD_INIT(name)
+
+list_add
+    __list_add(struct list_head *new,
+                struct list_head *prev,
+                struct list_head *next)
+
+list_add_tail
+
+list_del
+
+list_for_each_enry(pos, head, member)
+
+list_entry the wrapper of the container_of
+
+kernel sleeping mechanism
+
+wait queue
+
+include/linux/wait.h
+
+struct __wait_queue
+
+the functions you will always face when dealing with wait queues are:
+
+staic declaration
+    DECLARE_WAIT_QUEUE_HEAD(name)
+
+dynamic declaration
+    wait_queue_head_t my_wait_queue;
+    init_waitqueue_head(&my_wait_queue);
+
+blocking
+    int wait_event_interruptible(wait_queue_head_t q, CONDITION)
+
+    if false, process is put into a TASK_INTERRUPTIBLE
+
+unblocking
+    void wake_up_interruptible(wait_queue_head_t *q)
+
+    if true, process state set to TASK_RUNNING
+
+to awaken all processes
+    wake_up_interruptible_all
+
+
+in fact the main functions are:
+    wait_event
+    wake_up
+    wake_up_all
+
+standard timers
+
+<linux/jiffies.h>
+
+extern u64 jiffies_64;
+
+timers api
+
+<linux/timer.h>
+
+struct timer_list
+
+
+setup_timer wrapper init_timer
+
+init_timer
+
+mod_timer
+
+del_timer
+
+del_timer_sync
+
+timer_pending
+
+
+high resolution timers
+
+CONFIG_HIGH_RES_TIMERS
+
+based on ktime
+
+<linux/hrtimer.h>
+
+struct hrtimer
+
+hrtimer_init
+
+hrtimer_start
+
+    hrtimer_mod   HRTIMER_MODE_AES  HRTIMER_MODE_REL
+
+hrtimer_cancel
+
+hrtimer_try_to_cancel
+    internally calls hrtimer_callback_running
+
+hrtimer_callback_running
+
+callback function must return HRTIMER_NORESTART
+
+check whether HRTs are available on your system
+
+    by looking in the config file
+        CONFIG_HIGH_RES_TIMERS=y  by zcat /proc/configs.gz | grep CONFIG_HIGH_RES_TIMERS
+
+    by looking at the cat /proc/timer_list
+                      cat /proc/timer_list | grep resolution
+
+    by using system call clock_getres
+
+    from within the kernel code: #ifdef CONFIG_HIGH_RES_TIMERS
 
 
