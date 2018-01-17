@@ -525,6 +525,30 @@ request_threaded_irq()
 
 if the intterrupt processing needs nore than 100us,you should use bottom half
 
+ch4 Character Device Drivers
 
+include/linux/cdev.h
 
+struct cdev
 
+struct file_operations
+
+the kernel holds the numbers that identify a device in dev_t type varibles
+major is 12 bits minor is 20 bits
+
+dev_t 
+
+include/linux/kdev_t.h
+
+MAJOR(dev_t dev);
+MINOR(dev_t dev);
+
+MKDEV(int major, int minor);
+
+device number allocation and freeing
+
+statically
+    int register_chrdev_region() this should void using 
+
+dynamically
+    int alloc_chrdev_region()
