@@ -321,3 +321,210 @@ check whether HRTs are available on your system
     from within the kernel code: #ifdef CONFIG_HIGH_RES_TIMERS
 
 
+delays and sleep in the kernel
+
+<linux/delay>
+
+atomic context
+
+ndelay(unsigned long nsecs)
+
+udelay(unsigned long usecs)
+
+mdelay(unsigned long msecs)
+
+you should always use udelay()
+
+
+nonatomic context
+
+sleep[_range]
+
+udelay busy-wait loop based  (< ~10us)
+
+usleep_range(unsigned long min, unsigned long max) relies on hrtimers (10us - 20ms)
+
+msleep(unsigned long msecs)  (10ms+)
+
+well explained in Documentation/timers/timers-howto.txt
+
+kernel locking mechanism
+
+the most important
+
+mutex
+
+semaphore
+
+spinlock
+
+
+mutex: mutual exclusion
+
+include/linux/mutex.h
+
+struct mutex 
+
+statically
+    DEFINE_MUTEX(my_mutex);
+
+dynamically
+    struct mutex my_mutex;
+    mutex_init(&my_mutex);
+
+lock
+    void mutex_lock();
+    int mutex_lock_interruptible();
+    int mutex_lock_killable();
+
+unlock
+    void mutex_unlock();
+
+check
+    int mutex_is_locked();
+
+
+spin_lock();
+
+spin_lock_irqsave();
+    internally call these functions
+        local_irq_save();
+        preempt_disable();
+
+spin_unlock_irqstore();
+
+spin_unlock_irqsave();
+
+
+mutex protects the processor's critical resources
+
+spinlock protects the IRQ handler's critical sections
+
+
+work defferring mechanism
+
+SoftIRQs: Executed in an atomic context
+
+Tasklets: Executed in an atomic context
+
+Workqueues: Executed in a process context
+
+kernel/softirq.c to see how ksoftirqd are designed
+
+
+struct tasklet_struct
+
+dynamically
+    void tasklet_init()
+
+statically
+    DECLARE_TASKLET();
+    DECLARE_TASKLET_DISABLED();
+        must call tasklet_enable()
+
+tasklet_enable()
+older kernel version: tasklet_hi_enable()
+
+tasklet_disable()
+
+tasklet_diable_nosync()
+
+tasklet_schedule()
+
+tasklet_hi_schedule()
+
+tasklet_kill()
+
+work queue
+
+as a deferring mechanism
+
+struct work_struct
+
+schedule_work()
+
+inline bool schedule_delayed_work()
+
+schedule_work_on()
+
+schedule_delayed_work_on()
+
+system's shared work queue system_wq
+
+defined in kernel/workqueue.c
+
+    struct workqueue_struct *system_wq __read_mostly;
+    EXPORT_SYMBOL(system_wq);
+
+cancel_delayed_work()
+
+flush_scheduled_work()
+
+
+dedicated work queue
+
+struct work_struct
+
+4 steps prior to scheduling your work
+
+1. decalre/initalize a struct workqueue_struct
+
+2. create your work function
+
+3. create a struct work_struct so that your work function will be embeded into it
+
+4. embed your work function in the work_queue
+
+include/linux/workqueue.h
+
+declare work and work queue
+    struct workqueue_struct *myqueue;
+    struct work_struct thework;
+
+define the worker function
+    vodi dowork(void *data)
+
+initalize our work queue and embed out work into
+
+myqueue = create_singlethread_workqueue("mywork");
+
+INIT_WORK(&thework, dowork, <data-pointer>)
+
+we could also created our work queues through a macro called create_workqueue
+
+scheduling work
+    queue_work()
+
+    queue_dalayed_work()
+
+wait on all pending work
+    flush_workqueue()
+
+cleanup
+    cancel_work_sync()
+    cancel_delayed_work_sync()
+
+kernel interruption mechanism
+
+linux/interrupt.h
+
+request_irq()
+
+name this is used by the kernel to identify your driver in /proc/interrupts and /proc/irq
+
+IRQ_RETVAL(val)
+
+free_irq()
+
+
+in the kernel source
+    grep -m tasklet_schedule
+
+request_threaded_irq()
+
+
+if the intterrupt processing needs nore than 100us,you should use bottom half
+
+
+
+
