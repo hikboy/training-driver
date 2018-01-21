@@ -552,3 +552,37 @@ statically
 
 dynamically
     int alloc_chrdev_region()
+
+device file operation
+
+struct file_operations
+
+#inlcude/linux/fs.h
+
+the kernel describes files as instances of struct inode 
+
+struct inode
+
+struct file represents an open file in the kernel
+
+allocating and regitstering a character device
+
+1) reserve a major and a range of minors with alloc_chrdev_region()
+2) create a class for your devices with class_create(), visible in /sys/class
+3) set up a struct file_operation(to be given to cdev_int),and for each device one needs to create, call cdev_init() and cdev_add() to register the device
+4) the create a device_create() for each device, with a proper name.it will result in your device being created int the /dev/directory
+
+exchanging data between kernel space and user space 
+
+copy_from_user()
+
+copy_to_user()
+
+a single value copy
+
+put_user(x, ptr)
+get_user(x, ptr)
+
+
+
+
