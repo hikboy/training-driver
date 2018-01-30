@@ -583,6 +583,30 @@ a single value copy
 put_user(x, ptr)
 get_user(x, ptr)
 
+The ioctl method
+Linux provides four helper macros
+_IO(MAGIC, SEQ_NO)
+_IOW(MAGIC, SEQ_NO, TYPE)
+_IOR(MAGIC, SEQ_NO, TYPE)
+_IORW(MAGIC, SEQ_NO, TYPE)
+
+Documentation/ioctl/ioctl-decoding.txt
+Documentation/ioctl/ioctl-number.txt
+
+Platform drivers 
+
+static struct platform_driver
+
+There are only six type of resources in the kernel
+
+include/linux/ioport.h
+
+struct resource
+
+DT
+#include <linux/of.h>
+#include <linux/of_device.h>
+
 
 
 
