@@ -607,6 +607,38 @@ DT
 #include <linux/of.h>
 #include <linux/of_device.h>
 
+.dts board level source file 
+.dtsi soc level source file (see as header file)
+.dtb bianry file 
 
+the third form runtime representation of the DT in
+/proc/device-tree
+
+dtc device tree compiler
+
+compile all DT files for arm SoC's:
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make dtbs
+
+for a standalone DT:
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make imx6dl-sabrelite.dtb
+
+.dtb to .dts
+
+dtc -I dtb -O dtsarch/arm/boot/dts imx6dl-sabrelite.dtb > path/to/my_devicetree.dts
+
+For the purpose of debugging,it could be useful to expose the DT to the user space.
+
+CONFIG_PROC_DEVICETREE
+
+and you can explore and walk through the DT
+/proc/device-tree
+
+named resources
+reg-names
+clock-names
+interrupt-names
+dma-names
+
+Handling interrupts
 
 
